@@ -9,8 +9,8 @@ emails, and URLs — built entirely with free tools.
 | Phase | Topic | Status |
 |-------|-------|--------|
 | 1 | Scam classifier with LLM + prompt engineering | ✅ Complete |
-| 2 | Tool calling — live URL and domain verification | 🔄 In Progress |
-| 3 | Multi-agent orchestration with LangGraph | ⏳ Coming |
+| 2 | Tool calling — live URL and domain verification | ✅ Complete |
+| 3 | Multi-agent orchestration with LangGraph | 🔄 In Progress |
 | 4 | Memory with vector database (ChromaDB) | ⏳ Coming |
 | 5 | Streamlit dashboard — free deployment | ⏳ Coming |
 
