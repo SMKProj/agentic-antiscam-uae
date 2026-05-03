@@ -1,0 +1,10 @@
+streamlit
+groq
+langgraph
+langchain-core
+python-whois
+requests
+beautifulsoup4
+dnspython
+chromadb
+sentence-transformers
