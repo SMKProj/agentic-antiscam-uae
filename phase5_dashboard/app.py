@@ -43,7 +43,10 @@ import chromadb
 from datetime import datetime, timezone
 from bs4 import BeautifulSoup
 from groq import Groq
-from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+import pickle
 from langgraph.graph import StateGraph, END
 from typing import TypedDict
 
@@ -190,7 +193,38 @@ MODEL  = "llama-3.3-70b-versatile"
 
 @st.cache_resource
 def load_embedding_model():
-    return SentenceTransformer("all-MiniLM-L6-v2")
+    """
+    Returns a TF-IDF based embedder that mimics the sentence-transformer API.
+    Uses sklearn TF-IDF + cosine similarity — no heavy dependencies needed.
+    You already know this from your data science background.
+    """
+    class TFIDFEmbedder:
+        def __init__(self):
+            self.vectorizer = TfidfVectorizer(
+                max_features=500,
+                ngram_range=(1, 2),
+                stop_words="english"
+            )
+            self.fitted     = False
+            self.corpus     = []
+
+        def fit(self, texts):
+            self.corpus = texts
+            self.vectorizer.fit(texts)
+            self.fitted = True
+
+        def encode(self, text):
+            if not self.fitted:
+                self.vectorizer.fit([text])
+                self.fitted = True
+            vec = self.vectorizer.transform([text]).toarray()[0]
+            norm = np.linalg.norm(vec)
+            return vec / norm if norm > 0 else vec
+
+        def get_sentence_embedding_dimension(self):
+            return 500
+
+    return TFIDFEmbedder()
 
 @st.cache_resource
 def load_chroma():
