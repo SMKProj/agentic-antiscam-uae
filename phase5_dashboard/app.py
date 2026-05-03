@@ -257,12 +257,12 @@ def whois_lookup(domain):
             if c.tzinfo is None: c = c.replace(tzinfo=timezone.utc)
             age = (datetime.now(timezone.utc) - c).days
         else: age = None
-        if age is None:  risk = "unknown"
-        elif age < 30:   risk = "VERY HIGH"
-        elif age < 180:  risk = "HIGH"
-        elif age < 365:  risk = "MEDIUM"
-        else:            risk = "LOW"
-        return {"domain":domain,"age_days":age,"age_risk":risk,
+        if age is None:   risk = "unknown"
+            elif age < 30:    risk = "VERY HIGH"
+            elif age < 180:   risk = "HIGH"
+            elif age < 365:   risk = "MEDIUM"
+            else:             risk = "LOW"
+                return {"domain":domain,"age_days":age,"age_risk":risk,
                 "registrar":str(w.registrar or "unknown"),
                 "country":str(w.country or "unknown"),"status":"success"}
     except Exception as e:
@@ -319,8 +319,9 @@ def analyze_email(email):
         return {"email":email,"status":"invalid"}
     prefix, domain = email.split("@", 1)
     free = ["gmail.com","yahoo.com","hotmail.com","outlook.com"]
-    sus  = ["hralert","hr-alert","noreply-hr","jobs-alert",
-            "marketing","alert-team","recruitment-alert"]
+    sus = ["hralert","hr-alert","noreply-hr","jobs-alert",
+       "marketing","alert-team","recruitment-alert",
+       "company","info","hello","hi","contact"] 
     is_free    = domain.lower() in free
     sus_prefix = any(p in prefix.lower() for p in sus)
     try:
@@ -667,7 +668,9 @@ Return ONLY JSON:
 
             h = 0
             for w in ev["whois"]:
-                if w.get("age_risk") in ["VERY HIGH","HIGH"]: h+=1
+                if w.get("age_risk") == "VERY HIGH": h+=2
+                elif w.get("age_risk") == "HIGH":    h+=1
+                elif w.get("age_risk") == "MEDIUM":  h+=1
             for e in ev["emails"]:
                 if e.get("email_risk")=="HIGH": h+=1
             for v in ev["vt"]:
