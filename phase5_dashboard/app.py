@@ -37,6 +37,8 @@ import re
 import requests
 import whois
 import dns.resolver
+import os
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 import chromadb
 from datetime import datetime, timezone
 from bs4 import BeautifulSoup
