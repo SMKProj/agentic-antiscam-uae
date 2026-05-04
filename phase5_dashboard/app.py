@@ -150,7 +150,6 @@ def load_memory():
                 "timestamp":datetime.now(timezone.utc).isoformat(),
             })
             self._save()
-             """Searches by pre-computed vector — embedder called outside."""
         def search(self, query_vec, n=3, threshold=0.35):
             cases = [c for c in self.cases if c.get("embedding")]
             if not cases:
