@@ -394,6 +394,10 @@ def bool_badge(val, yes_cls="b-red", no_cls="b-green"):
 
 # ── MAIN ──────────────────────────────────────────────────────
 def main():
+    # Force cache clear on next deploy — remove after one successful run
+    if "cache_cleared" not in st.session_state:
+        st.cache_resource.clear()
+        st.session_state["cache_cleared"] = True
     embedder, etype = load_embedder()
     memory          = load_memory()
 
