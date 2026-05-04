@@ -150,17 +150,22 @@ def load_memory():
                 "timestamp":datetime.now(timezone.utc).isoformat(),
             })
             self._save()
-        def search(self, q, emb, et, n=3, th=0.35):
+        def search(self, query_vec, n=3, threshold=0.35):
+            """Searches by pre-computed vector — embedder called outside."""
             cases = [c for c in self.cases if c.get("embedding")]
-            if not cases: return []
-            qv = np.array(encode(q, emb, et)).reshape(1,-1)
+            if not cases:
+                return []
+            qv = np.array(query_vec).reshape(1, -1)
             sv = np.array([c["embedding"] for c in cases])
             sc = cosine_similarity(qv, sv)[0]
-            res = [{"case_id":cases[i]["id"],"similarity":round(float(sc[i]),3),
-                    "metadata":cases[i]}
-                   for i in range(len(cases)) if sc[i] >= th]
+            res = [
+                {"case_id"  : cases[i]["id"],
+                 "similarity": round(float(sc[i]), 3),
+                 "metadata" : cases[i]}
+                for i in range(len(cases)) if sc[i] >= threshold
+            ]
             res.sort(key=lambda x: x["similarity"], reverse=True)
-            return res[:n]
+        return res[:n]
         def get_all(self): return self.cases
     return Memory(MEMORY_FILE)
 
@@ -515,7 +520,9 @@ def main():
     state = {}
 
     # Agent 0: Memory
-    similar = memory.search(message, embedder, etype, n=3, threshold=0.35)
+    # Compute vector first, then search
+    query_vec = encode(message, embedder, etype)
+    similar   = memory.search(query_vec, n=3, threshold=0.35)
     state["similar"] = similar
     update_agents(1, "Orchestrator", "extracting…")
 
@@ -739,8 +746,8 @@ Return ONLY JSON:
     # Store in memory
     cid = f"case_{int(time.time())}"
     memory.store(cid, message, verd_res,
-                 {"technical_risk":tech_r,"cultural_risk":cult_r,"nlp_risk":nlp_r},
-                 embedder, etype)
+             {"technical_risk":tech_r,"cultural_risk":cult_r,"nlp_risk":nlp_r},
+             embedder, etype)
 
     # ── DISPLAY ───────────────────────────────────────────────
     is_scam = verd_res.get("is_scam", False)
