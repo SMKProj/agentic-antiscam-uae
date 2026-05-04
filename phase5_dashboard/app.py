@@ -11,10 +11,8 @@ import streamlit as st
 from datetime import datetime, timezone
 from bs4 import BeautifulSoup
 from groq import Groq
-from groq import GroqClient 
 from sklearn.metrics.pairwise import cosine_similarity
 
-groq_client = GroqClient(api_key=GROQ_API_KEY)
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 st.set_page_config(
