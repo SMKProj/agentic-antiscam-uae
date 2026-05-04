@@ -150,8 +150,8 @@ def load_memory():
                 "timestamp":datetime.now(timezone.utc).isoformat(),
             })
             self._save()
+             """Searches by pre-computed vector — embedder called outside."""
         def search(self, query_vec, n=3, threshold=0.35):
-            """Searches by pre-computed vector — embedder called outside."""
             cases = [c for c in self.cases if c.get("embedding")]
             if not cases:
                 return []
@@ -159,14 +159,12 @@ def load_memory():
             sv = np.array([c["embedding"] for c in cases])
             sc = cosine_similarity(qv, sv)[0]
             res = [
-                {"case_id"  : cases[i]["id"],
-                 "similarity": round(float(sc[i]), 3),
-                 "metadata" : cases[i]}
-                for i in range(len(cases)) if sc[i] >= threshold
+                {"case_id"   : cases[i]["id"],"similarity": round(float(sc[i]), 3), "metadata"  : cases[i]}
+            for i in range(len(cases)) if sc[i] >= threshold
             ]
             res.sort(key=lambda x: x["similarity"], reverse=True)
         return res[:n]
-        def get_all(self): return self.cases
+    def get_all(self): return self.cases
     return Memory(MEMORY_FILE)
 
 def seed_memory(mem, emb, et):
