@@ -162,7 +162,7 @@ def load_memory():
             for i in range(len(cases)) if sc[i] >= threshold
             ]
             res.sort(key=lambda x: x["similarity"], reverse=True)
-        return res[:n]
+            return res[:n]
     def get_all(self): return self.cases
     return Memory(MEMORY_FILE)
 
