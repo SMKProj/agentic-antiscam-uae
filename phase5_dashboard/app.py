@@ -725,10 +725,15 @@ def main():
     </div>
     """, unsafe_allow_html=True)
 
+    if "msg_input" not in st.session_state:
+    st.session_state["msg_input"] = ""
+    
     message = st.text_area(
         label="msg", label_visibility="collapsed",
         height=120,
-        placeholder="Paste any suspicious SMS, email, or WhatsApp message here…"
+        placeholder="Paste any suspicious SMS, email, or WhatsApp message here…",
+        value=st.session_state["msg_input"],
+        key="msg_input"
     )
 
     c1, c2 = st.columns(2)
@@ -746,6 +751,7 @@ def main():
     """, unsafe_allow_html=True)
 
     if clear_btn:
+        st.session_state["msg_input"] = ""
         st.rerun()
 
     if not run_btn or not message.strip():
