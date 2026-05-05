@@ -726,7 +726,7 @@ def main():
     """, unsafe_allow_html=True)
 
     if "msg_input" not in st.session_state:
-    st.session_state["msg_input"] = ""
+        st.session_state["msg_input"] = ""
     
     message = st.text_area(
         label="msg", label_visibility="collapsed",
