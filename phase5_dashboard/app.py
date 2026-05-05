@@ -735,7 +735,9 @@ def main():
         value=st.session_state["msg_input"],
         key="msg_input"
     )
-
+    def clear_text():
+        st.session_state["msg_input"] = ""
+        
     c1, c2 = st.columns(2)
     with c1:
         run_btn   = st.button("🔍 Investigate | تحقق",
@@ -750,8 +752,7 @@ def main():
     </div>
     """, unsafe_allow_html=True)
 
-    def clear_text():
-        st.session_state["msg_input"] = ""
+    
         
     if clear_btn:
         st.rerun()
