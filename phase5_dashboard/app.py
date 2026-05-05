@@ -741,7 +741,7 @@ def main():
         run_btn   = st.button("🔍 Investigate | تحقق",
                               type="primary", use_container_width=True)
     with c2:
-        clear_btn = st.button("✕  Clear | مسح", use_container_width=True)
+        clear_btn = st.button("✕  Clear | مسح", use_container_width=True, on_click=clear_text)
 
     st.markdown("""
     <div style="font-size:11px;color:#bbb;text-align:center;margin:4px 0 10px;">
@@ -750,10 +750,12 @@ def main():
     </div>
     """, unsafe_allow_html=True)
 
-    if clear_btn:
+    def clear_text():
         st.session_state["msg_input"] = ""
+        
+    if clear_btn:
         st.rerun()
-
+    
     if not run_btn or not message.strip():
         st.markdown("""
         <div class="footer-bar">
