@@ -29,6 +29,12 @@ if not GROQ_KEY:
 
 groq_client = Groq(api_key=GROQ_KEY)
 
+
+import streamlit as st
+with st.expander("Available Groq models"):
+    st.write([m.id for m in groq_client.models.list().data])
+
+
 st.set_page_config(
     page_title="UAE Anti-Scam | كاشف الاحتيال",
     page_icon="🛡️",
