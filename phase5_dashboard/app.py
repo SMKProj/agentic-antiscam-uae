@@ -28,13 +28,6 @@ if not GROQ_KEY:
     st.stop()
 
 groq_client = Groq(api_key=GROQ_KEY)
-
-
-import streamlit as st
-with st.expander("Available Groq models"):
-    st.write([m.id for m in groq_client.models.list().data])
-
-
 st.set_page_config(
     page_title="UAE Anti-Scam | كاشف الاحتيال",
     page_icon="🛡️",
@@ -268,7 +261,8 @@ div[data-testid="column"]:first-child div[data-testid="stButton"] > button {
 """, unsafe_allow_html=True)
 
 # ── CONSTANTS ─────────────────────────────────────────────────
-MODEL = "llama-3.3-70b-versatile"
+#MODEL = "llama-3.3-70b-versatile"
+MODEL = st.secrets.get("GROQ_MODEL", "openai/gpt-oss-120b")
 MEMORY_FILE = "/tmp/scam_memory.json"
 SUSPICIOUS_TLDS = [
     ".co", ".tk", ".ml", ".ga", ".cf", ".gq",
@@ -638,8 +632,12 @@ def call_llm(sys_p, usr_p):
         model=MODEL,
         messages=[{"role": "system", "content": sys_p},
                   {"role": "user",   "content": usr_p}],
-        temperature=0.1, max_tokens=1200)
-    return r.choices[0].message.content.strip()
+        temperature=0.1,
+        max_tokens=3000,
+        reasoning_effort="low",
+        response_format={"type": "json_object"},
+    )
+    return (r.choices[0].message.content or "").strip()
 
 
 def parse_json(raw):
@@ -738,7 +736,6 @@ def main():
         label="msg", label_visibility="collapsed",
         height=120,
         placeholder="Paste any suspicious SMS, email, or WhatsApp message here…",
-        value=st.session_state["msg_input"],
         key="msg_input"
     )
     def clear_text():
@@ -1082,10 +1079,13 @@ Return ONLY JSON:
                      f'{b(f"{age} days", risk_cls(ar))}</div>')
             rows += (f'<div class="ev-row"><span class="ev-key">Domain TLD</span>'
                      f'{b(".co suspicious", "b-red") if tld else b("Normal", "b-green")}</div>')
-        for e in ev.get("emails", []):
-            rows += (f'<div class="ev-row"><span class="ev-key">Email prefix</span>'
-                     f'{b(f"{e.get(chr(112)+(chr(114)+chr(101))+(chr(102)+chr(105))+(chr(120))+chr(64))!r} generic" if e.get("sus_prefix") else "OK", "b-amber" if e.get("sus_prefix") else "b-green")}</div>')
-        comp = ev.get("company", {})
+            for e in ev.get("emails", []):
+                prefix = e.get("prefix", "")
+                label  = f"{prefix}@ generic" if e.get("sus_prefix") else "OK"
+                cls    = "b-amber" if e.get("sus_prefix") else "b-green"
+                rows += (f'<div class="ev-row"><span class="ev-key">Email prefix</span>'
+                     f'{b(label, cls)}</div>')
+            comp = ev.get("company", {})
         if comp:
             cr_   = comp.get("existence_risk", "LOW")
             unr   = any("unreachable" in s for s in comp.get("absence_signals", []))
